@@ -30,3 +30,8 @@ do-build:		$(BANNER_ICON_MIDDLE) $(TARGETS)
 
 #----------------------------------------------------------------------------
 include $(TWLSDK_ROOT)/build/buildtools/modulerules
+
+
+# Breaks too often, just do this manually and edit as needed:
+#	/cygdrive/c/TwlSDK_5.5/tools/bin/ntexconv.exe -no -bg -bgb -bgnc -ta -f palette16 banner.bmp
+#	/cygdrive/c/TwlSDK_5.5/tools/bin/makebanner.TWL.exe -N banner banner.bsf banner.bnr
