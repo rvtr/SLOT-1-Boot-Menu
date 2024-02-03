@@ -14,12 +14,15 @@
 #include "screen.h"
 #include "DEMO.h"
 #include "payload.h"
+#include "twlnmenu.h"
 
 /*---------------------------------------------------------------------------*
     Constant Definitions
  *---------------------------------------------------------------------------*/
+#define VERSION				61
 #define KEY_REPEAT_START    25  // Number of frames until key repeat starts
 #define KEY_REPEAT_SPAN     10  // Number of frames between key repeats
+#define DMA_NO_FS	1
 
 /*---------------------------------------------------------------------------*
     Structure Definitions
@@ -55,6 +58,7 @@ static void InitHeap(void);
 static void ReadKey(KeyInfo* pKey);
 
 /*---------------------------------------------------------------------------*/
+void VBlankIntr(void);
 
 void TwlMain(void)
 {
@@ -72,6 +76,8 @@ void TwlMain(void)
     InitHeap();
     InitScreen();
     InitInterrupts();
+    
+    FS_Init(DMA_NO_FS);
 
     GX_DispOn();
     GXS_DispOn();
@@ -89,22 +95,30 @@ void TwlMain(void)
         // Clear the main screen
         ClearScreen();
         
-        // 32 wide
-        PutMainScreen(0, 0, 0xff, "SLOT-1 Boot Menu");
-        PutMainScreen(0, 3, 0xff, "By rmc and Nintendo.");
-        PutMainScreen(0, 4, 0xff, "https://rvtr.github.io/");
+        PutMainScreen(0, 1, 0xff, " ------ SLOT-1 BOOT MENU ------ ");
+        PutMainScreen(0, 3, 0xff, "  By rmc                        ");
+        PutMainScreen(0, 4, 0xff, "  https://rvtr.github.io/       ");
+        PutMainScreen(0, 6, 0xff, " ------------------------------ ");
         
-        PutSubScreen(0, 0, 0xff, "SLOT-1 Boot Menu");
-        PutSubScreen(0, 2, 0xff, "  A: Launcher");
-        PutSubScreen(0, 3, 0xff, "  B: MachineSettings");
-        PutSubScreen(0, 4, 0xff, "  X: SD card (smdc:/boot.nds)");
+        // 32 wide, 24 tall
+        PutSubScreen(0, 0, 0xff, "  SLOT-1 BOOT MENU ver.%06d", VERSION);
+        PutSubScreen(0, 2, 0xff, " -- KEY -------- COMMAND ------ ");
+        PutSubScreen(0, 4, 0xf2, "    A:           Launcher       ");
+        PutSubScreen(0, 6, 0xf2, "    B:           Settings       ");
+        PutSubScreen(0, 8, 0xf2, "    X:           TwlNmenu       ");
+        PutSubScreen(0, 10, 0xf2, "    Y:           SD (boot.nds)  ");
+		PutSubScreen(0, 20, 0xff, " ------------------------------ ");
+		PutSubScreen(0, 21, 0xff, " STATUS:                        ");
+		PutSubScreen(0, 22, 0xff, " Currently no error occurs      ");
+
         
         if (gKey.trg & PAD_BUTTON_A)
         {
             if (FALSE == OS_JumpToSystemMenu() )
+            // OSi_CanArbitraryJumpTo(0x00030015484e4241)
             {
                 //Jump failure
-                OS_Panic("Failed jump to Launcher!");
+                PutSubScreen(0, 22, 0xf1, " Failed jump to Launcher        ");
             }
         }
 
@@ -113,13 +127,23 @@ void TwlMain(void)
             if (FALSE == OS_JumpToWirelessSetting())
             {
                 //Jump failure
-                OS_Panic("Failed jump to MachineSetting!");
+                PutSubScreen(0, 22, 0xf1, " Failed jump to MachineSettings ");
             }
         }
-
+        
         if (gKey.trg & PAD_BUTTON_X)
+		{
+            result = WriteTwlNmenu();
+            if(result = TRUE )
+            {
+                JumpTwlNmenu();
+            }
+            PutSubScreen(0, 22, 0xf1, " Failed to write to TwlNmenu    ");
+		}
+
+        if (gKey.trg & PAD_BUTTON_Y)
         {
-        	// Adapted from nathanfarlow's stylehax (adapted from shutterbug2000 and zoogie's memory pit)
+        	// """Adapted""" from nathanfarlow's stylehax (adapted from shutterbug2000 and zoogie's memory pit)
             uu8 *payload_dest = (uu8 *)0x02200000;
 
 			int i;
@@ -133,7 +157,8 @@ void TwlMain(void)
         // Wait for V-Blank (this supports threading)
         OS_WaitVBlankIntr();
     }
-
+    
+    OS_WaitVBlankIntr();
     OS_Terminate();
 }
 

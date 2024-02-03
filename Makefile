@@ -11,6 +11,9 @@
 
 # SUBDIRS		= banner \
 
+#---------------------------------------------------------------------------
+
+
 TARGET_PLATFORM := TWL
 
 TWL_ARCHGEN		= LIMITED
@@ -18,6 +21,9 @@ TWL_ARCHGEN		= LIMITED
 TARGET_BIN	= SLOT1_Booter.srl
 
 SRCS		= main.c screen.c font.c
+
+MAKEROM_ROMROOT		= ./data
+MAKEROM_ROMFILES	= *.srl
 
 ROM_SPEC	= specfile.rsf
 
@@ -31,3 +37,4 @@ include	$(TWLSDK_ROOT)/build/buildtools/commondefs.gx.demolib
 do-build:	$(TARGETS)
 
 include	$(TWLSDK_ROOT)/build/buildtools/modulerules
+
