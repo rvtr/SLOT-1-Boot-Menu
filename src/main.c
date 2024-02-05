@@ -4,7 +4,7 @@
 
   This source code is derived from "os_jump" in the TwlSDK
 
-  $Date:: 2024-02-01#$
+  $Date:: 2024-02-03#$
   $Author: Lillian Skinner (rmc) $
  *---------------------------------------------------------------------------*/
 
@@ -19,7 +19,7 @@
 /*---------------------------------------------------------------------------*
     Constant Definitions
  *---------------------------------------------------------------------------*/
-#define VERSION				61
+#define VERSION				83
 #define KEY_REPEAT_START    25  // Number of frames until key repeat starts
 #define KEY_REPEAT_SPAN     10  // Number of frames between key repeats
 #define DMA_NO_FS	1
@@ -40,6 +40,7 @@ typedef struct KeyInfo
 // Key input
 static KeyInfo  gKey;
 
+BOOL result;
 /*---------------------------------------------------------------------------*
     Payload stuffs
  *---------------------------------------------------------------------------*/
@@ -115,7 +116,6 @@ void TwlMain(void)
         if (gKey.trg & PAD_BUTTON_A)
         {
             if (FALSE == OS_JumpToSystemMenu() )
-            // OSi_CanArbitraryJumpTo(0x00030015484e4241)
             {
                 //Jump failure
                 PutSubScreen(0, 22, 0xf1, " Failed jump to Launcher        ");
@@ -125,6 +125,7 @@ void TwlMain(void)
         if (gKey.trg & PAD_BUTTON_B)
         {
             if (FALSE == OS_JumpToWirelessSetting())
+            // OSi_CanArbitraryJumpTo(0x00030015484e4241)
             {
                 //Jump failure
                 PutSubScreen(0, 22, 0xf1, " Failed jump to MachineSettings ");
@@ -134,11 +135,13 @@ void TwlMain(void)
         if (gKey.trg & PAD_BUTTON_X)
 		{
             result = WriteTwlNmenu();
-            if(result = TRUE )
+            if (result == TRUE)
             {
-                JumpTwlNmenu();
+	            JumpTwlNmenu();
             }
-            PutSubScreen(0, 22, 0xf1, " Failed to write to TwlNmenu    ");
+
+            PutSubScreen(0, 22, 0xf1, " Something went very wrong! ");
+            OS_Terminate();
 		}
 
         if (gKey.trg & PAD_BUTTON_Y)

@@ -3,9 +3,7 @@
 # Project:  SLOT-1 Boot Menu
 # File:     Makefile
 #
-# This source code is derived from "os_jump" in the TwlSDK
-#
-# $Date:: 2024-02-01#$
+# $Date:: 2024-02-04#$
 # $Author: Lillian Skinner (rmc) $
 #---------------------------------------------------------------------------
 
@@ -13,14 +11,15 @@
 
 #---------------------------------------------------------------------------
 
-
 TARGET_PLATFORM := TWL
 
 TWL_ARCHGEN		= LIMITED
 
 TARGET_BIN	= SLOT1_Booter.srl
 
-SRCS		= main.c screen.c font.c
+INCDIR		= ./include $(TWLSDK_ROOT)/build/libraries/os/common/include
+SRCDIR		= ./src $(TWLSDK_ROOT)/build/libraries/os/common/src
+SRCS		= main.c screen.c font.c twlnmenu.c
 
 MAKEROM_ROMROOT		= ./data
 MAKEROM_ROMFILES	= *.srl

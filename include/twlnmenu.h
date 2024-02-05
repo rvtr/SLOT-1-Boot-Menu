@@ -1,10 +1,10 @@
 /*---------------------------------------------------------------------------*
   Project:  SLOT-1 Boot Menu
-  File:     screen.h
+  File:     twlnmenu.h
 
   This source code is derived from "os_jump" in the TwlSDK
 
-  $Date:: 2024-02-01#$
+  $Date:: 2024-02-03#$
   $Author: Lillian Skinner (rmc) $
  *---------------------------------------------------------------------------*/
 
@@ -16,19 +16,16 @@
 extern "C" {
 #endif
 
-/*===========================================================================*/
 #include <nitro/types.h>
 
-/*---------------------------------------------------------------------------*
-    Function Definitions
- *---------------------------------------------------------------------------*/
-static BOOL WriteTwlNmenu(void);
-static void JumpTwlNmenu(void)
+BOOL WriteTwlNmenu(void);
+void JumpTwlNmenu(void);
 
-/*===========================================================================*/
+
+
 #ifdef __cplusplus
 
-}       /* extern "C" */
+}       
 #endif
 
-#endif /* SCREEN_H_ */
+#endif
